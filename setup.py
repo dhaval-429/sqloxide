@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 from setuptools import setup
 
-packages = ["sqloxide"]
+packages = ["io/sqloxide"]
 
 package_data = {"": ["*"]}
 
