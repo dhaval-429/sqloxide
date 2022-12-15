@@ -134,6 +134,7 @@ jobs:
           - {tag: manylinux_2_24, arch: ppc64le}
 
     runs-on: ubuntu-latest
+    container: quay.io/pypa/${{ matrix.tag }}_${{ matrix.arch }}
     steps:
       # - name: Checkout repos
       #   uses: actions/checkout@v3
