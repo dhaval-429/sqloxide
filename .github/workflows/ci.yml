@@ -167,32 +167,35 @@ jobs:
         with:
           path: io
 
-      - uses: actions/setup-python@v2
-        with:
-          python-version: 3.8
+      # - uses: actions/setup-python@v2
+      #   with:
+      #     python-version: 3.8
 
       # - name: Set up QEMU for multi-arch build
       #   uses: docker/setup-qemu-action@v1
 
-      - name: Run image
-        uses: abatilo/actions-poetry@v2
+      # - name: Run image
+      #   uses: abatilo/actions-poetry@v2
 
-      - name: Install package deps
-        run: | 
-          poetry install
+      # - name: Install package deps
+      #   run: | 
+      #     poetry install
       
-      - name: Install rust toolchain
-        uses: actions-rs/toolchain@v1
-        with:
-          toolchain: stable
-          override: true
+      # - name: Install rust toolchain
+      #   uses: actions-rs/toolchain@v1
+      #   with:
+      #     toolchain: stable
+      #     override: true
 
-      - name: Build Python package
-        run: poetry run python setup.py bdist_wheel && poetry install
+      # - name: Build Python package
+      #   run: poetry run python setup.py bdist_wheel && poetry install
 
-      - name: pytest
-        run: poetry run pytest tests
+      # - name: pytest
+      #   run: poetry run pytest tests
 
+      - name: build wheels
+        run: io/build-wheels.sh
+        
       - name: archive wheels
         uses: actions/upload-artifact@v2
         with:
