@@ -200,8 +200,10 @@ jobs:
           -e PLAT=${{ matrix.tag }}_${{ matrix.arch }}
           -e PACKAGE_NAME=sqloxide
           -e PYVERS="cp37-cp37m cp38-cp38 cp39-cp39 cp310-cp310 cp311-cp311"
+          -v `pwd`:/src
+          --workdir /src
           quay.io/pypa/${{ matrix.tag }}_${{ matrix.arch }}
-          io/build-wheels.sh
+          ./build-wheels.sh
 
       - name: archive wheels
         uses: actions/upload-artifact@v2
