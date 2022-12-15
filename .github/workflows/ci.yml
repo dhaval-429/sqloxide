@@ -129,9 +129,9 @@ jobs:
       matrix:
         include:
           # - {tag: manylinux2014, arch: x86_64}
-          - {tag: manylinux2014, arch: i686}
+          # - {tag: manylinux2014, arch: i686}
           - {tag: manylinux_2_24, arch: aarch64}
-          - {tag: manylinux_2_24, arch: ppc64le}
+          # - {tag: manylinux_2_24, arch: ppc64le}
 
     runs-on: ubuntu-latest
     # container: quay.io/pypa/${{ matrix.tag }}_${{ matrix.arch }}
@@ -201,7 +201,7 @@ jobs:
           -e PACKAGE_NAME=sqloxide
           -e PYVERS="cp36-cp36m cp37-cp37m cp38-cp38 cp39-cp39 cp310-cp310 cp311-cp311"
           quay.io/pypa/${{ matrix.tag }}_${{ matrix.arch }}
-          build-wheels.sh
+          ./build-wheels.sh
 
       - name: archive wheels
         uses: actions/upload-artifact@v2
