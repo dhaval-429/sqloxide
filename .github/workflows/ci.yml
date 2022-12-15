@@ -199,11 +199,9 @@ jobs:
           docker run --rm
           -e PLAT=${{ matrix.tag }}_${{ matrix.arch }}
           -e PACKAGE_NAME=sqloxide
-          -e PYVERS="cp36-cp36m cp37-cp37m cp38-cp38 cp39-cp39 cp310-cp310 cp311-cp311"
+          -e PYVERS="cp37-cp37m cp38-cp38 cp39-cp39 cp310-cp310 cp311-cp311"
           quay.io/pypa/${{ matrix.tag }}_${{ matrix.arch }}
-
-      - name: build wheel
-        run: io/build-wheels.sh
+          io/build-wheels.sh
 
       - name: archive wheels
         uses: actions/upload-artifact@v2
