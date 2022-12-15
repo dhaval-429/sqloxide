@@ -168,14 +168,14 @@ jobs:
           path: io
       - uses: actions/setup-python@v2
         with:
-          python-version: 3.7
-          path: io
+          python-version: "cp37-cp37m cp38-cp38 cp39-cp39 cp310-cp310 cp311-cp311"
 
       # - name: Set up QEMU for multi-arch build
       #   uses: docker/setup-qemu-action@v1
 
       - name: Run image
         uses: abatilo/actions-poetry@v2
+
       - name: Install package deps
         run: | 
           poetry install
