@@ -129,9 +129,9 @@ jobs:
       matrix:
         include:
           - {tag: manylinux2014, arch: x86_64}
-          - {tag: manylinux2014, arch: i686}
-          - {tag: manylinux_2_24, arch: aarch64}
-          - {tag: manylinux_2_24, arch: ppc64le}
+          # - {tag: manylinux2014, arch: i686}
+          # - {tag: manylinux_2_24, arch: aarch64}
+          # - {tag: manylinux_2_24, arch: ppc64le}
 
     runs-on: ubuntu-latest
     container: quay.io/pypa/${{ matrix.tag }}_${{ matrix.arch }}
@@ -164,10 +164,11 @@ jobs:
       #     path: |
       #       dist/*/*${{ matrix.tag }}_${{ matrix.arch }}.whl
       - uses: actions/checkout@v2
+        with:
+          path: io
       - uses: actions/setup-python@v2
         with:
           python-version: 3.7
-          path: io
 
       # - name: Set up QEMU for multi-arch build
       #   uses: docker/setup-qemu-action@v1
