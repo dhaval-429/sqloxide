@@ -168,7 +168,7 @@ jobs:
           path: io
       - uses: actions/setup-python@v2
         with:
-          python-version: "cp37-cp37m cp38-cp38 cp39-cp39 cp310-cp310 cp311-cp311"
+          python-version: "cp37-cp37m"
 
       # - name: Set up QEMU for multi-arch build
       #   uses: docker/setup-qemu-action@v1
