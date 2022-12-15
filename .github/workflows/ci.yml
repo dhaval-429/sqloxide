@@ -203,7 +203,7 @@ jobs:
           quay.io/pypa/${{ matrix.tag }}_${{ matrix.arch }}
 
       - name: build wheel
-          io/build-wheels.sh
+        run: io/build-wheels.sh
 
       - name: archive wheels
         uses: actions/upload-artifact@v2
