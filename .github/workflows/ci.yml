@@ -169,6 +169,7 @@ jobs:
       - uses: actions/setup-python@v2
         with:
           python-version: 3.7
+          path: io
 
       # - name: Set up QEMU for multi-arch build
       #   uses: docker/setup-qemu-action@v1
