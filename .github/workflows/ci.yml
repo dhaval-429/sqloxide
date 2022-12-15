@@ -192,7 +192,7 @@ jobs:
         uses: actions/upload-artifact@v2
         with:
           name: wheels
-          path: dist/*.whl
+          path: dist/*${{ matrix.tag }}_${{ matrix.arch }}.whl
 
   # publish:
   #   runs-on: ubuntu-latest
