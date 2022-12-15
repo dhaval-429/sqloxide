@@ -191,9 +191,8 @@ jobs:
       - name: archive wheels
         uses: actions/upload-artifact@v2
         with:
-          name: packages_${{ matrix.tag }}_${{ matrix.arch }}
-          path: |
-            dist/*/*${{ matrix.tag }}_${{ matrix.arch }}.whl
+          name: wheels
+          path: dist/*.whl
 
   # publish:
   #   runs-on: ubuntu-latest
