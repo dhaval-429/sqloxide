@@ -243,6 +243,12 @@ jobs:
         with:
           platforms: all
 
+      - name: Install rust toolchain
+        uses: actions-rs/toolchain@v1
+        with:
+          toolchain: stable
+          override: true
+
       - name: Build compiled wheels
         if: ${{ matrix.wheel_mode == 'compiled' }}
         uses: pypa/cibuildwheel@v2.11.2
