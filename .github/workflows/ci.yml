@@ -128,10 +128,10 @@ jobs:
       fail-fast: false
       matrix:
         include:
-          # - {tag: manylinux2014, arch: x86_64}
+          - {tag: manylinux2014, arch: x86_64}
           - {tag: manylinux2014, arch: i686}
-          - {tag: manylinux_2_24, arch: aarch64}
-          - {tag: manylinux_2_24, arch: ppc64le}
+          - {tag: manylinux2014, arch: aarch64}
+          - {tag: manylinux2014, arch: ppc64le}
 
     runs-on: ubuntu-latest
     # container: quay.io/pypa/${{ matrix.tag }}_${{ matrix.arch }}
