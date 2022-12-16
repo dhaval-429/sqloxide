@@ -247,6 +247,7 @@ jobs:
         if: ${{ matrix.wheel_mode == 'compiled' }}
         uses: pypa/cibuildwheel@v2.11.2
         env:
+          CIBW_BUILD: 'cp39-*'
           CIBW_ARCHS_LINUX: ${{ matrix.linux_archs }}
           CIBW_ENVIRONMENT: 'PATH="$HOME/.cargo/bin:$PATH"'
           CIBW_ENVIRONMENT_WINDOWS: 'PATH="$UserProfile\.cargo\bin;$PATH"'
