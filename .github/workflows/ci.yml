@@ -128,8 +128,8 @@ jobs:
       fail-fast: false
       matrix:
         include:
-          - {tag: manylinux2014, arch: x86_64}
-          - {tag: manylinux2014, arch: i686}
+          # - {tag: manylinux2014, arch: x86_64}
+          # - {tag: manylinux2014, arch: i686}
           - {tag: manylinux2014, arch: aarch64}
           - {tag: manylinux2014, arch: ppc64le}
 
@@ -203,7 +203,7 @@ jobs:
           -v `pwd`:/io
           --workdir /io
           quay.io/pypa/${{ matrix.tag }}_${{ matrix.arch }}
-          io/build-wheels.sh
+          bash /io/build-wheels.sh
 
       - name: archive wheels
         uses: actions/upload-artifact@v2
