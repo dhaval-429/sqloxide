@@ -8,6 +8,12 @@ edition = "2018"
 name = "sqloxide"
 crate-type = ["cdylib"]
 
+[target.aarch64-unknown-unknown]
+rustflags = [
+  "-C", "link-arg=-undefined",
+  "-C", "link-arg=dynamic_lookup",
+]
+
 [dependencies]
 pythonize = "0.17"
 
