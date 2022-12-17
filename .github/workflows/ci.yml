@@ -39,61 +39,61 @@ jobs:
   #         command: test
   #         toolchain: stable
 
-  # native-build:
-  #   runs-on: ${{ matrix.os }}
-  #   # needs: lint
-  #   strategy:
-  #     fail-fast: false
-  #     matrix:
-  #       python-version: ["3.7", "3.8", "3.9", "3.10", "3.11"]
-  #       os: [macos-latest, windows-latest, ubuntu-latest]
-  #       exclude:
-  #         - os: macos-latest # no runners available yet
-  #           python-version: "3.11"
-  #   steps:
-  #     - uses: actions/checkout@v2
-  #     - uses: actions/setup-python@v2
-  #       with:
-  #         python-version: ${{ matrix.python-version }}
-  #     - name: Run image
-  #       uses: abatilo/actions-poetry@v2
-  #     - name: Install package deps
-  #       run: | 
-  #         poetry install
+  native-build:
+    runs-on: ${{ matrix.os }}
+    # needs: lint
+    strategy:
+      fail-fast: false
+      matrix:
+        python-version: ["3.7", "3.8", "3.9", "3.10", "3.11"]
+        os: [macos-latest, windows-latest, ubuntu-latest]
+        exclude:
+          - os: macos-latest # no runners available yet
+            python-version: "3.11"
+    steps:
+      - uses: actions/checkout@v2
+      - uses: actions/setup-python@v2
+        with:
+          python-version: ${{ matrix.python-version }}
+      - name: Run image
+        uses: abatilo/actions-poetry@v2
+      - name: Install package deps
+        run: | 
+          poetry install
       
-  #     - name: Install rust toolchain
-  #       uses: actions-rs/toolchain@v1
-  #       with:
-  #         toolchain: stable
-  #         override: true
+      - name: Install rust toolchain
+        uses: actions-rs/toolchain@v1
+        with:
+          toolchain: stable
+          override: true
 
-  #     - name: Install Rust aarch64-apple-darwin target
-  #       if: matrix.os == 'macos-latest'
-  #       run: rustup target add aarch64-apple-darwin
+      - name: Install Rust aarch64-apple-darwin target
+        if: matrix.os == 'macos-latest'
+        run: rustup target add aarch64-apple-darwin
 
-  #     - name: Build on macOS universal2
-  #       if: matrix.os == 'macos-latest'
-  #       shell: bash
-  #       env:
-  #         DEVELOPER_DIR: /Applications/Xcode.app/Contents/Developer
-  #         MACOSX_DEPLOYMENT_TARGET: '10.9'
-  #         ARCHFLAGS: -arch x86_64 -arch arm64
-  #         PYO3_CROSS_LIB_DIR: /Applications/Xcode.app/Contents/Developer/Library/Frameworks/Python3.framework/Versions/3.8/lib
-  #       run: poetry run python setup.py bdist_wheel && poetry install
+      - name: Build on macOS universal2
+        if: matrix.os == 'macos-latest'
+        shell: bash
+        env:
+          DEVELOPER_DIR: /Applications/Xcode.app/Contents/Developer
+          MACOSX_DEPLOYMENT_TARGET: '10.9'
+          ARCHFLAGS: -arch x86_64 -arch arm64
+          PYO3_CROSS_LIB_DIR: /Applications/Xcode.app/Contents/Developer/Library/Frameworks/Python3.framework/Versions/3.8/lib
+        run: poetry run python setup.py bdist_wheel && poetry install
 
-  #     - name: Build Python package
-  #       if:  matrix.os != 'macos-latest'
-  #       run: poetry run python setup.py bdist_wheel && poetry install
+      - name: Build Python package
+        if:  matrix.os != 'macos-latest'
+        run: poetry run python setup.py bdist_wheel && poetry install
 
-  #     - name: pytest
-  #       run: poetry run pytest tests
+      - name: pytest
+        run: poetry run pytest tests
 
-  #     - name: archive wheels
-  #       uses: actions/upload-artifact@v2
-  #       if: matrix.os != 'ubuntu-latest'
-  #       with:
-  #         name: wheels
-  #         path: dist/*.whl
+      - name: archive wheels
+        uses: actions/upload-artifact@v2
+        if: matrix.os != 'ubuntu-latest'
+        with:
+          name: wheels
+          path: dist/*.whl
 
   #     - name: Release
   #       uses: softprops/action-gh-release@v1
@@ -103,35 +103,16 @@ jobs:
   #       env:
   #         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
-  # manylinux-build:
-  #   runs-on: ubuntu-latest
-  #   container: quay.io/pypa/manylinux2014_x86_64
-  #   # needs: lint
-  #   steps:
-  #     - name: checkout repo
-  #       uses: actions/checkout@v2
-  #       with:
-  #         path: io
-     
-  #     - name: build wheels
-  #       run: io/build-wheels.sh
-
-  #     - name: archive wheels
-  #       uses: actions/upload-artifact@v2
-  #       with:
-  #         name: wheels
-  #         path: io/dist/*manylinux2014*.whl
-
-  build-manylinux:
+  manylinux-build:
     if: true
     strategy:
       fail-fast: false
       matrix:
         include:
           - {tag: manylinux2014, arch: x86_64}
-          # - {tag: manylinux2014, arch: i686}
-          # - {tag: manylinux2014, arch: aarch64}
-          # - {tag: manylinux2014, arch: ppc64le}
+          - {tag: manylinux2014, arch: i686}
+          - {tag: manylinux2014, arch: aarch64}
+          - {tag: manylinux2014, arch: ppc64le}
 
     runs-on: ubuntu-latest
     steps:
@@ -161,7 +142,7 @@ jobs:
 
   publish:
     runs-on: ubuntu-latest
-    needs: [build-manylinux]
+    needs: [native-build, manylinux-build]
     steps: 
 
       - uses: actions/download-artifact@v2
