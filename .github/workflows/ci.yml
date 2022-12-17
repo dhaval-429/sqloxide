@@ -122,20 +122,20 @@ jobs:
   #         name: wheels
   #         path: io/dist/*manylinux2014*.whl
 
-  build-manylinux:
-    if: true
-    strategy:
-      fail-fast: false
-      matrix:
-        include:
-          # - {tag: manylinux2014, arch: x86_64}
-          # - {tag: manylinux2014, arch: i686}
-          - {tag: manylinux2014, arch: aarch64}
-          - {tag: manylinux2014, arch: ppc64le}
+  # build-manylinux:
+  #   if: true
+  #   strategy:
+  #     fail-fast: false
+  #     matrix:
+  #       include:
+  #         - {tag: manylinux2014, arch: x86_64}
+  #         # - {tag: manylinux2014, arch: i686}
+  #         # - {tag: manylinux_2_24, arch: aarch64}
+  #         # - {tag: manylinux_2_24, arch: ppc64le}
 
-    runs-on: ubuntu-latest
-    # container: quay.io/pypa/${{ matrix.tag }}_${{ matrix.arch }}
-    steps:
+  #   runs-on: ubuntu-latest
+  #   container: quay.io/pypa/${{ matrix.tag }}_${{ matrix.arch }}
+  #   steps:
       # - name: Checkout repos
       #   uses: actions/checkout@v3
 
@@ -146,31 +146,32 @@ jobs:
       #   run: >-
       #     docker run --rm
       #     -e PLAT=${{ matrix.tag }}_${{ matrix.arch }}
-      #     -e PACKAGE_NAME=sqloxide
+      #     -e PACKAGE_NAME=psycopg2-binary
       #     -e PYVERS="cp36-cp36m cp37-cp37m cp38-cp38 cp39-cp39 cp310-cp310 cp311-cp311"
-      #     -v `pwd`:/io
-      #     --workdir /io
+      #     -e PSYCOPG2_TESTDB=postgres
+      #     -e PSYCOPG2_TESTDB_HOST=172.17.0.1
+      #     -e PSYCOPG2_TESTDB_USER=postgres
+      #     -e PSYCOPG2_TESTDB_PASSWORD=password
+      #     -e PSYCOPG2_TEST_FAST=1
+      #     -v `pwd`:/src
+      #     --workdir /src
       #     quay.io/pypa/${{ matrix.tag }}_${{ matrix.arch }}
-      #     io/build-wheels.sh
+      #     ./scripts/build/build_${{ matrix.tag }}.sh
       # - name: Upload artifacts
       #   uses: actions/upload-artifact@v3
       #   with:
       #     name: packages_${{ matrix.tag }}_${{ matrix.arch }}
       #     path: |
       #       dist/*/*${{ matrix.tag }}_${{ matrix.arch }}.whl
-      - uses: actions/checkout@v2
-        with:
-          path: io
-
-      - name: Set up QEMU for multi-arch build
-        uses: docker/setup-qemu-action@v1
-
+      # - uses: actions/checkout@v2
+      #   with:
+      #     path: io
       # - uses: actions/setup-python@v2
       #   with:
-      #     python-version: 3.8
+      #     python-version: "cp37-cp37m"
 
-      # - name: Set up QEMU for multi-arch build
-      #   uses: docker/setup-qemu-action@v1
+      # # - name: Set up QEMU for multi-arch build
+      # #   uses: docker/setup-qemu-action@v1
 
       # - name: Run image
       #   uses: abatilo/actions-poetry@v2
@@ -191,25 +192,111 @@ jobs:
       # - name: pytest
       #   run: poetry run pytest tests
 
-      # - name: build wheels
-      #   run: io/build-wheels.sh
+      # - name: archive wheels
+      #   uses: actions/upload-artifact@v2
+      #   with:
+      #     name: wheels
+      #     path: io/dist/*${{ matrix.tag }}_${{ matrix.arch }}.whl
 
-      - name: build wheels
-        run: >-
-          docker run --rm
-          -e PLAT=${{ matrix.tag }}_${{ matrix.arch }}
-          -e PACKAGE_NAME=sqloxide
-          -e PYVERS="cp37-cp37m cp38-cp38 cp39-cp39 cp310-cp310 cp311-cp311"
-          -v `pwd`:/io
-          --workdir /io
-          quay.io/pypa/${{ matrix.tag }}_${{ matrix.arch }}
-          io/build-wheels.sh
+  build_wheels:
+    name: Build ${{ matrix.wheel_mode }} wheels on ${{ matrix.os }} ${{ matrix.linux_archs }}
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+        include:
+          # - os: windows-2022
+          #   wheel_mode: compiled
+          # - os: macos-12
+          #   wheel_mode: compiled
+          # emulated wheels on linux take too much time, so run two jobs
+          # - os: ubuntu-22.04
+          #   wheel_mode: compiled
+          #   linux_archs: "x86_64"
+          - os: ubuntu-22.04
+            wheel_mode: compiled
+            linux_archs: "aarch64"
+          # create pure python build
+          # - os: ubuntu-22.04
+          #   wheel_mode: pure-python
 
-      - name: archive wheels
-        uses: actions/upload-artifact@v2
+      fail-fast: false
+
+    steps:
+      - uses: actions/checkout@v3
+
+      # - name: Remove tag_build from setup.cfg
+      #   # sqlalchemy has `tag_build` set to `dev` in setup.cfg. We need to remove it before creating the weel
+      #   # otherwise it gets tagged with `dev0`
+      #   shell: pwsh
+      #   # This is equivalent to the sed commands:
+      #   # `sed -i '/tag_build=dev/d' setup.cfg`
+      #   # `sed -i '/tag_build = dev/d' setup.cfg`
+
+      #   # `-replace` uses a regexp match
+      #   # alternative form: `(get-content setup.cfg) | foreach-object{$_ -replace "tag_build.=.dev",""} | set-content setup.cfg`
+      #   run: |
+      #     (cat setup.cfg) | %{$_ -replace "tag_build.?=.?dev",""} | set-content setup.cfg
+      # See details at https://cibuildwheel.readthedocs.io/en/stable/faq/#emulation
+      - name: Set up QEMU on linux
+        if: ${{ runner.os == 'Linux' }}
+        uses: docker/setup-qemu-action@v2
         with:
-          name: wheels
-          path: io/dist/*${{ matrix.tag }}_${{ matrix.arch }}.whl
+          platforms: all
+
+      - name: Build compiled wheels
+        if: ${{ matrix.wheel_mode == 'compiled' }}
+        uses: pypa/cibuildwheel@v2.11.2
+        env:
+          CIBW_BUILD: 'cp39-*'
+          CIBW_ARCHS_LINUX: ${{ matrix.linux_archs }}
+          CIBW_ENVIRONMENT: 'PATH="$HOME/.cargo/bin:$PATH"'
+          CIBW_ENVIRONMENT_WINDOWS: 'PATH="$UserProfile\.cargo\bin;$PATH"'
+          CIBW_BEFORE_BUILD: >
+            pip install -U setuptools-rust &&
+            rustup default nightly &&
+            rustup show
+          CIBW_BEFORE_BUILD_LINUX: >
+            pip install -U setuptools-rust &&
+            curl https://sh.rustup.rs -sSf | sh -s -- --default-toolchain=nightly --profile=minimal -y &&
+            rustup show
+
+
+
+      # - name: Set up Python for twine and pure-python wheel
+      #   uses: actions/setup-python@v4
+      #   with:
+      #     python-version: "3.10"
+
+      # - name: Build pure-python wheel
+      #   if: ${{ matrix.wheel_mode == 'pure-python' && runner.os == 'Linux' }}
+      #   run: |
+      #     python -m pip install --upgrade pip
+      #     pip --version
+      #     pip install build
+      #     pip list
+      #     DISABLE_SQLALCHEMY_CEXT=y python -m build --wheel --outdir ./wheelhouse
+      - uses: actions/upload-artifact@v3
+        with:
+          path: ./wheelhouse/*.whl
+
+      # - name: Upload wheels to release
+      #   # upload the generated wheels to the github release
+      #   uses: sqlalchemyorg/upload-release-assets@sa
+      #   with:
+      #     repo-token: ${{ secrets.GITHUB_TOKEN }}
+      #     files: './wheelhouse/*.whl'
+
+      # - name: Publish wheel
+      #   # the action https://github.com/marketplace/actions/pypi-publish runs only on linux and we cannot specify
+      #   # additional options
+      #   env:
+      #     TWINE_USERNAME: __token__
+      #     # replace TWINE_PASSWORD with token for real pypi
+      #     # TWINE_PASSWORD: ${{ secrets.test_pypi_token }}
+      #     TWINE_PASSWORD: ${{ secrets.pypi_token }}
+      #   run: |
+      #     pip install -U twine
+      #     twine upload --skip-existing ./wheelhouse/*
 
   # publish:
   #   runs-on: ubuntu-latest
