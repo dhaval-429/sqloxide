@@ -16,7 +16,7 @@ for whl in dist/*.whl; do
     auditwheel repair "$whl" -w dist/
 done
 
-cd io
+cd ..
 for PYBIN in /opt/python/cp{37,38,39,310,311}*/bin; do
     "${pybin}/pip" install ${PACKAGE_NAME} --no-index -f dist/
     "${pybin}/pytest" tests/test_sqloxide.py
