@@ -18,5 +18,5 @@ done
 
 for PYBIN in /opt/python/cp{37,38,39,310,311}*/bin; do
     "${PYBIN}/pip" install ${PACKAGE_NAME} --no-index -f dist/
-    "${PYBIN}" pytest tests/test_sqloxide.py
+    "${PYBIN}/python" -m pytest tests/test_sqloxide.py
 done
