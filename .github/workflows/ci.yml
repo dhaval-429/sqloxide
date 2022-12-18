@@ -131,7 +131,7 @@ jobs:
         run: >-
           docker run --rm
           -e PLAT=${{ matrix.tag }}_${{ matrix.arch }}
-          -e PACKAGE_NAME=sqloxide
+          -e PACKAGE_NAME=test-sqloxide
           -e PYVERS="cp37-cp37m cp38-cp38 cp39-cp39 cp310-cp310 cp311-cp311"
           -v `pwd`:/io
           --workdir /io
@@ -161,4 +161,4 @@ jobs:
           user: __token__
           password: ${{ secrets.PYPI_API_TOKEN }}
           skip_existing: true
-          repository_url: https://test.pypi.org/legacy/
+          # repository_url: https://test.pypi.org/legacy/
