@@ -29,7 +29,3 @@ def test_throw_exception():
     """
     with pytest.raises(ValueError, match=r"Query parsing failed.\n\tsql parser error: .+"):
         ast = parse_sql(sql=sql, dialect="ansi")[0]
-
-
-if __name__ == '__main__':
-    pytest.main()
