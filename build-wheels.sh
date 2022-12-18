@@ -17,6 +17,6 @@ for whl in dist/*.whl; do
 done
 
 for PYBIN in /opt/python/cp{37,38,39,310,311}*/bin; do
-    "${pybin}/pip" install ${PACKAGE_NAME} --no-index -f io
+    "${pybin}/pip" install ${PACKAGE_NAME} --no-index -f io/
     "${pybin}/pytest" tests/test_sqloxide.py
 done
